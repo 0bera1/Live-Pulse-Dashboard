@@ -1,5 +1,6 @@
 "use client";
 
+import { useT } from "@/lib/live-pulse/i18n";
 import { clockTime } from "@/lib/live-pulse/format";
 import { SOURCES, usePulseState } from "@/lib/live-pulse/status-store";
 import { useNow } from "@/lib/live-pulse/useNow";
@@ -7,15 +8,8 @@ import { AnimatedNumber } from "./AnimatedNumber";
 
 const fmtCount = (n: number) => String(Math.round(n));
 
-const LABELS = {
-  earthquakes: "Deprem",
-  crypto: "Kripto",
-  fx: "Döviz",
-  weather: "Hava",
-  github: "GitHub",
-} as const;
-
 export function StatusHeader() {
+  const t = useT();
   const { sources, requests, totalLatencyMs } = usePulseState();
   const list = SOURCES.map((id) => ({ id, ...sources[id] }));
   const avgLatency = requests ? Math.round(totalLatencyMs / requests) : 0;
@@ -26,7 +20,7 @@ export function StatusHeader() {
   const lastUpdate = Math.max(0, ...list.map((s) => s.checkedAt ?? 0)) || null;
 
   const system = booting
-    ? { label: "BAŞLATILIYOR", tone: "text-muted", dot: "bg-muted" }
+    ? { label: t.header.booting, tone: "text-muted", dot: "bg-muted" }
     : allLive
       ? { label: "LIVE", tone: "text-up", dot: "bg-up pulse-dot" }
       : online > 0
@@ -36,13 +30,12 @@ export function StatusHeader() {
   return (
     <header className="flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between">
       <div className="max-w-2xl">
-        <p className="font-mono text-[11px] uppercase tracking-[0.3em] text-accent">Operasyon Merkezi // 01</p>
+        <p className="font-mono text-[11px] uppercase tracking-[0.3em] text-accent">{t.header.eyebrow}</p>
         <h1 className="mt-3 text-5xl font-semibold tracking-tight text-ink sm:text-6xl">
           Live Pulse<span className="text-accent">.</span>
         </h1>
         <p className="mt-4 text-base leading-relaxed text-ink-2 sm:text-lg">
-          Dünyanın nabzını gerçek zamanlı izleyen operasyon merkezi. Depremler, piyasalar, hava durumu ve
-          açık kaynak dünyası, beş halka açık veri kaynağından tek ekranda.
+          {t.header.intro}
         </p>
       </div>
 
@@ -55,23 +48,23 @@ export function StatusHeader() {
           </span>
         </div>
         <div className="mt-3 flex items-baseline justify-between gap-4 border-t border-line pt-3 font-mono text-xs">
-          <span className="text-muted">Son güncelleme</span>
+          <span className="text-muted">{t.header.lastUpdate}</span>
           <span className="text-ink tabular-nums">{lastUpdate ? clockTime(lastUpdate) : "--:--:--"}</span>
         </div>
         <div className="mt-1.5 flex items-baseline justify-between gap-4 font-mono text-xs">
-          <span className="text-muted">Aktif kaynak</span>
+          <span className="text-muted">{t.header.activeSources}</span>
           <span className="text-ink tabular-nums">
             {online}/{list.length}
           </span>
         </div>
         <div className="mt-1.5 flex items-baseline justify-between gap-4 font-mono text-xs">
-          <span className="text-muted">Bu oturumda istek</span>
+          <span className="text-muted">{t.header.sessionRequests}</span>
           <span className="text-ink">
             <AnimatedNumber value={requests} format={fmtCount} flash={false} duration={0.4} />
-            <span className="text-muted"> · ort. {avgLatency} ms</span>
+            <span className="text-muted">{t.header.avg(avgLatency)}</span>
           </span>
         </div>
-        <ul className="mt-3 flex flex-wrap gap-1.5" aria-label="Kaynak durumları">
+        <ul className="mt-3 flex flex-wrap gap-1.5" aria-label={t.header.sourcesAria}>
           {list.map((s) => (
             <li
               key={s.id}
@@ -84,7 +77,7 @@ export function StatusHeader() {
                 }`}
                 aria-hidden
               />
-              {LABELS[s.id]}
+              {t.header.sources[s.id]}
             </li>
           ))}
         </ul>
@@ -95,10 +88,11 @@ export function StatusHeader() {
 }
 
 function LocalClock() {
+  const t = useT();
   const now = useNow(1000);
   return (
     <p className="mt-3 border-t border-line pt-3 text-right font-mono text-[11px] text-muted tabular-nums">
-      Yerel saat {now ? clockTime(now) : "--:--:--"}
+      {t.header.localTime} {now ? clockTime(now) : "--:--:--"}
     </p>
   );
 }

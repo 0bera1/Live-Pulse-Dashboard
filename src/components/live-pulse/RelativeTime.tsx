@@ -1,10 +1,12 @@
 "use client";
 
+import { useT } from "@/lib/live-pulse/i18n";
 import { relativeTime } from "@/lib/live-pulse/format";
 import { useNow } from "@/lib/live-pulse/useNow";
 
-/** Self-ticking "12 sn önce" label; only this span re-renders each second. */
+/** Self-ticking "12 s ago" label; only this span re-renders each second. */
 export function RelativeTime({ time, className }: { time: number; className?: string }) {
+  useT(); // re-render on language change
   const now = useNow(1000);
   return (
     <time dateTime={new Date(time).toISOString()} className={className}>

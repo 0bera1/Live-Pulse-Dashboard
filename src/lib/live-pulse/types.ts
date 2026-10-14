@@ -23,7 +23,6 @@ export interface Quake {
 }
 
 export interface QuakeData {
-  windowLabel: string;
   count: number;
   quakes: Quake[];
 }

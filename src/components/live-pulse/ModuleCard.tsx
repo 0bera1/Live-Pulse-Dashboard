@@ -2,6 +2,7 @@
 
 import type { LucideIcon } from "lucide-react";
 import type { ReactNode } from "react";
+import { useT } from "@/lib/live-pulse/i18n";
 import type { SourceId } from "@/lib/live-pulse/types";
 import { PollCountdown, RefreshBar } from "./PollMeter";
 
@@ -41,6 +42,7 @@ export function ModuleCard({
   className = "",
   children,
 }: Props) {
+  const t = useT();
   const status = !hasData ? (loading ? "loading" : "down") : degraded ? "stale" : "live";
 
   return (
@@ -66,8 +68,8 @@ export function ModuleCard({
         {status === "loading" && skeleton}
         {status === "down" && (
           <div className="flex flex-1 flex-col items-center justify-center gap-2 py-10 text-center">
-            <p className="text-sm text-ink-2">Veri şu an alınamıyor</p>
-            <p className="font-mono text-[11px] text-muted">Bağlantı otomatik olarak yeniden denenecek</p>
+            <p className="text-sm text-ink-2">{t.card.downTitle}</p>
+            <p className="font-mono text-[11px] text-muted">{t.card.downHint}</p>
           </div>
         )}
         {hasData && children}
@@ -75,10 +77,10 @@ export function ModuleCard({
 
       <footer className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 border-t border-line px-5 py-2.5 font-mono text-[11px] text-muted">
         <a href={sourceHref} target="_blank" rel="noreferrer" className="hover:text-ink-2">
-          Kaynak: {source}
+          {t.card.source}: {source}
         </a>
         <span className="flex items-center gap-1.5">
-          {degraded && hasData && <span className="text-warn">son bilinen veri ·</span>}
+          {degraded && hasData && <span className="text-warn">{t.card.lastKnown}</span>}
           <PollCountdown source={sourceId} />
         </span>
       </footer>
@@ -87,20 +89,21 @@ export function ModuleCard({
 }
 
 const BADGE = {
-  loading: { label: "BAĞLANIYOR", dot: "bg-muted", text: "text-muted" },
-  live: { label: "CANLI", dot: "bg-up pulse-dot", text: "text-up" },
-  stale: { label: "GECİKMELİ", dot: "bg-warn", text: "text-warn" },
-  down: { label: "ÇEVRİMDIŞI", dot: "bg-down", text: "text-down" },
+  loading: { dot: "bg-muted", text: "text-muted" },
+  live: { dot: "bg-up pulse-dot", text: "text-up" },
+  stale: { dot: "bg-warn", text: "text-warn" },
+  down: { dot: "bg-down", text: "text-down" },
 } as const;
 
 function StatusBadge({ status }: { status: keyof typeof BADGE }) {
+  const t = useT();
   const b = BADGE[status];
   return (
     <span
       className={`flex shrink-0 items-center gap-1.5 rounded-full border border-line px-2.5 py-1 font-mono text-[10px] tracking-[0.16em] ${b.text}`}
     >
       <span className={`size-1.5 rounded-full ${b.dot}`} aria-hidden />
-      {b.label}
+      {t.card.badge[status]}
     </span>
   );
 }

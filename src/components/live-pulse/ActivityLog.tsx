@@ -1,6 +1,7 @@
 "use client";
 
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { useT } from "@/lib/live-pulse/i18n";
 import { usePulseState } from "@/lib/live-pulse/status-store";
 import type { SourceId } from "@/lib/live-pulse/types";
 
@@ -25,6 +26,7 @@ const stamp = (ms: number) => {
  * HTTP status, measured latency and what changed. Nothing here is simulated.
  */
 export function ActivityLog() {
+  const t = useT();
   const { log } = usePulseState();
   const reduceMotion = useReducedMotion();
   const lines = log.slice(0, VISIBLE);
@@ -34,16 +36,16 @@ export function ActivityLog() {
       <header className="flex items-center justify-between gap-3 border-b border-line px-5 py-2.5">
         <h2 id="log-title" className="flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.2em] text-muted">
           <span className="size-1.5 rounded-full bg-up pulse-dot" aria-hidden />
-          Canlı sistem günlüğü
+          {t.log.title}
         </h2>
-        <span className="hidden font-mono text-[11px] text-muted sm:inline">tarayıcı → halka açık API</span>
+        <span className="hidden font-mono text-[11px] text-muted sm:inline">{t.log.subtitle}</span>
       </header>
 
       <ol
         className="relative h-[9.25rem] overflow-hidden px-5 py-2.5 font-mono text-[11.5px] leading-[1.7rem] sm:text-xs"
         aria-live="off"
       >
-        {lines.length === 0 && <li className="text-muted">bağlantılar kuruluyor…</li>}
+        {lines.length === 0 && <li className="text-muted">{t.log.connecting}</li>}
         <AnimatePresence initial={false} mode="popLayout">
           {lines.map((l, i) => (
             <motion.li

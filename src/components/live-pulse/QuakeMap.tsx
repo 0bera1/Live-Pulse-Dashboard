@@ -2,6 +2,7 @@
 
 import { memo, useRef, useState } from "react";
 import { ComposableMap, Geographies, Geography, Graticule, Marker, Sphere } from "react-simple-maps";
+import { useT } from "@/lib/live-pulse/i18n";
 import { fmtFixed } from "@/lib/live-pulse/format";
 import type { Quake } from "@/lib/live-pulse/types";
 import { RelativeTime } from "./RelativeTime";
@@ -12,9 +13,9 @@ const GEO_URL = `${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/geo/countries-110m.j
 const RECENT_MS = 60 * 60 * 1000;
 
 export const QUAKE_TIERS = [
-  { min: 6, label: "Güçlü · M6+", color: "var(--quake-strong)" },
-  { min: 4.5, label: "Orta · M4.5–5.9", color: "var(--quake-moderate)" },
-  { min: 0, label: "Hafif · M2.5–4.4", color: "var(--quake-light)" },
+  { min: 6, id: "strong", color: "var(--quake-strong)" },
+  { min: 4.5, id: "moderate", color: "var(--quake-moderate)" },
+  { min: 0, id: "light", color: "var(--quake-light)" },
 ] as const;
 
 export const quakeColor = (mag: number) => QUAKE_TIERS.find((t) => mag >= t.min)!.color;
@@ -53,6 +54,7 @@ interface Props {
 }
 
 function QuakeMapImpl({ quakes, referenceTime, activeId, onActiveChange }: Props) {
+  const t = useT();
   const wrap = useRef<HTMLDivElement>(null);
   const [tip, setTip] = useState<{ x: number; y: number } | null>(null);
 
@@ -77,7 +79,7 @@ function QuakeMapImpl({ quakes, referenceTime, activeId, onActiveChange }: Props
         projectionConfig={{ scale: 150, center: [10, 4] }}
         className="h-auto w-full"
         role="img"
-        aria-label={`Son 24 saatteki ${quakes.length} depremin dünya haritası`}
+        aria-label={t.quake.mapAria(quakes.length)}
       >
         <Land />
         {ordered.map((q) => {
@@ -128,7 +130,7 @@ function QuakeMapImpl({ quakes, referenceTime, activeId, onActiveChange }: Props
           </div>
           <p className="mt-0.5 text-xs leading-snug text-ink-2">{active.place}</p>
           <p className="mt-1 font-mono text-[11px] text-muted">
-            Derinlik {active.depthKm} km{active.tsunami ? " · tsunami uyarısı" : ""}
+            {t.quake.depth} {active.depthKm} km{active.tsunami ? ` · ${t.quake.tsunami}` : ""}
           </p>
         </div>
       )}

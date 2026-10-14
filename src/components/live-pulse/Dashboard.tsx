@@ -4,6 +4,7 @@ import { EarthquakeCard } from "./EarthquakeCard";
 import { Footer } from "./Footer";
 import { FxCard } from "./FxCard";
 import { GithubCard } from "./GithubCard";
+import { LanguageSwitch } from "./LanguageSwitch";
 import { StatusHeader } from "./StatusHeader";
 import { TechNotes } from "./TechNotes";
 import { WeatherCard } from "./WeatherCard";
@@ -17,6 +18,7 @@ export function Dashboard() {
   return (
     <div className="relative mx-auto flex w-full max-w-[1400px] flex-col gap-10 px-4 py-10 sm:px-6 lg:px-10 lg:py-14">
       <div className="flex flex-col gap-5">
+        <LanguageSwitch />
         <StatusHeader />
         <ActivityLog />
       </div>

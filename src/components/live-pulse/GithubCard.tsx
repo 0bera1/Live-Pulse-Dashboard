@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { useT } from "@/lib/live-pulse/i18n";
 import { describeGithub } from "@/lib/live-pulse/describe";
 import type { GithubData, GithubEvent, GithubEventKind } from "@/lib/live-pulse/types";
 import { usePolling } from "@/lib/live-pulse/usePolling";
@@ -27,24 +28,14 @@ const DRAIN_WINDOW_MS = 80_000;
 const MIN_GAP_MS = 1_500;
 const MAX_GAP_MS = 8_000;
 
-const KINDS: Record<Exclude<GithubEventKind, "other">, { verb: string; icon: LucideIcon; short: string }> = {
-  push: { verb: "kod gönderdi", icon: GitCommitHorizontal, short: "push" },
-  pr: { verb: "pull request", icon: GitPullRequest, short: "PR" },
-  issue: { verb: "issue", icon: CircleDot, short: "issue" },
-  star: { verb: "yıldızladı", icon: Star, short: "yıldız" },
-  fork: { verb: "fork'ladı", icon: GitFork, short: "fork" },
-  create: { verb: "oluşturdu", icon: GitBranch, short: "yeni" },
-  release: { verb: "sürüm yayınladı", icon: Tag, short: "sürüm" },
-};
-
-const ACTIONS: Record<string, string> = {
-  opened: "açtı",
-  closed: "kapattı",
-  reopened: "yeniden açtı",
-  merged: "birleştirdi",
-  branch: "dal oluşturdu",
-  tag: "etiket oluşturdu",
-  repository: "repo oluşturdu",
+const ICONS: Record<Exclude<GithubEventKind, "other">, LucideIcon> = {
+  push: GitCommitHorizontal,
+  pr: GitPullRequest,
+  issue: CircleDot,
+  star: Star,
+  fork: GitFork,
+  create: GitBranch,
+  release: Tag,
 };
 
 /**
@@ -93,6 +84,7 @@ function useEventStream(data: GithubData | null) {
 
 export function GithubCard({ className }: { className?: string }) {
   const { data, fetchedAt, loading, degraded } = usePolling<GithubData>("github", 90_000, describeGithub);
+  const t = useT();
   const { rows, queued } = useEventStream(data);
   const reduceMotion = useReducedMotion();
 
@@ -106,9 +98,9 @@ export function GithubCard({ className }: { className?: string }) {
   return (
     <ModuleCard
       sourceId="github"
-      title="Açık Kaynak Nabzı"
+      title={t.github.title}
       // lang="en" so the uppercase transform doesn't turn the "i" into "İ".
-      subtitle={<><span lang="en">GitHub</span> genel olay akışı</>}
+      subtitle={<><span lang="en">GitHub</span> {t.github.subtitle}</>}
       icon={Terminal}
       source="GitHub REST API"
       sourceHref="https://docs.github.com/rest/activity/events"
@@ -123,27 +115,27 @@ export function GithubCard({ className }: { className?: string }) {
         <>
           <div className="mb-3 flex flex-wrap items-baseline justify-between gap-2 font-mono text-[11px] text-muted">
             <p>
-              Son {data.events.length} olay:{" "}
+              {t.github.last(data.events.length)}{" "}
               {breakdown.map(([kind, n], i) => (
                 <span key={kind} className="text-ink-2">
                   {i > 0 && " · "}
-                  {n} {KINDS[kind as keyof typeof KINDS]?.short ?? kind}
+                  {n} {t.github.kinds[kind as keyof typeof ICONS]?.short ?? kind}
                 </span>
               ))}
             </p>
             {queued > 0 && (
               <p className="flex items-center gap-1.5 text-accent">
                 <span className="size-1.5 rounded-full bg-accent pulse-dot" aria-hidden />
-                {queued} olay akışa giriyor
+                {t.github.queued(queued)}
               </p>
             )}
           </div>
           <ul className="flex flex-col" aria-live="polite">
             <AnimatePresence initial={false}>
               {rows.map((e) => {
-                const k = KINDS[e.kind as keyof typeof KINDS];
-                const Icon = k.icon;
-                const verb = (e.detail && ACTIONS[e.detail]) || k.verb;
+                const k = t.github.kinds[e.kind as keyof typeof ICONS];
+                const Icon = ICONS[e.kind as keyof typeof ICONS];
+                const verb = (e.detail && t.github.actions[e.detail]) || k.verb;
                 return (
                   <motion.li
                     key={e.id}
@@ -170,7 +162,7 @@ export function GithubCard({ className }: { className?: string }) {
             </AnimatePresence>
           </ul>
           <p className="mt-auto pt-4 font-mono text-[11px] text-muted">
-            GitHub bu akışı kendi tarafında birkaç dakika gecikmeli yayınlar.
+            {t.github.delay}
           </p>
         </>
       )}

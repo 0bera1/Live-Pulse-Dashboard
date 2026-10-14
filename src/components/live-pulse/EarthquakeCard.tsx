@@ -2,6 +2,7 @@
 
 import { Activity } from "lucide-react";
 import { useState } from "react";
+import { useT } from "@/lib/live-pulse/i18n";
 import { describeQuakes } from "@/lib/live-pulse/describe";
 import { fmtFixed } from "@/lib/live-pulse/format";
 import type { QuakeData } from "@/lib/live-pulse/types";
@@ -17,6 +18,7 @@ const fmtMag = (n: number) => `M${fmtFixed(n, 1)}`;
 
 export function EarthquakeCard({ className }: { className?: string }) {
   const { data, fetchedAt, loading, degraded } = usePolling<QuakeData>("earthquakes", 20_000, describeQuakes);
+  const t = useT();
   const [activeId, setActiveId] = useState<string | null>(null);
 
   const strongest = data?.quakes.reduce((a, b) => (b.mag > a.mag ? b : a), data.quakes[0]);
@@ -25,8 +27,8 @@ export function EarthquakeCard({ className }: { className?: string }) {
   return (
     <ModuleCard
       sourceId="earthquakes"
-      title="Küresel Sismik Aktivite"
-      subtitle={data?.windowLabel ?? "Son 24 saat · M2.5+"}
+      title={t.quake.title}
+      subtitle={t.quake.subtitle}
       icon={Activity}
       source="USGS Earthquake Hazards"
       sourceHref="https://earthquake.usgs.gov/earthquakes/map/"
@@ -49,11 +51,11 @@ export function EarthquakeCard({ className }: { className?: string }) {
       {data && (
         <div className="flex flex-col gap-5">
           <dl className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-            <Stat label="Kaydedilen deprem">
+            <Stat label={t.quake.count}>
               <AnimatedNumber value={data.count} format={fmtInt} flash={false} className="text-4xl font-semibold text-ink" />
             </Stat>
             {strongest && (
-              <Stat label="En büyük" hint={strongest.place}>
+              <Stat label={t.quake.strongest} hint={strongest.place}>
                 <AnimatedNumber
                   value={strongest.mag}
                   format={fmtMag}
@@ -64,7 +66,7 @@ export function EarthquakeCard({ className }: { className?: string }) {
               </Stat>
             )}
             {latest && (
-              <Stat label="Son depremden bu yana" hint={latest.place}>
+              <Stat label={t.quake.since} hint={latest.place}>
                 <ElapsedClock time={latest.time} className="font-mono text-3xl font-semibold text-ink" />
               </Stat>
             )}
@@ -74,20 +76,20 @@ export function EarthquakeCard({ className }: { className?: string }) {
             <QuakeMap quakes={data.quakes} referenceTime={fetchedAt ?? 0} activeId={activeId} onActiveChange={setActiveId} />
           </div>
 
-          <ul className="flex flex-wrap items-center gap-x-5 gap-y-2 font-mono text-[11px] text-ink-2" aria-label="Lejant">
-            {[...QUAKE_TIERS].reverse().map((t) => (
-              <li key={t.label} className="flex items-center gap-2">
-                <span className="size-2.5 rounded-full" style={{ background: t.color }} aria-hidden />
-                {t.label}
+          <ul className="flex flex-wrap items-center gap-x-5 gap-y-2 font-mono text-[11px] text-ink-2" aria-label={t.quake.legend}>
+            {[...QUAKE_TIERS].reverse().map((tier) => (
+              <li key={tier.id} className="flex items-center gap-2">
+                <span className="size-2.5 rounded-full" style={{ background: tier.color }} aria-hidden />
+                {t.quake.tiers[tier.id]}
               </li>
             ))}
             <li className="flex items-center gap-2">
               <span className="size-2.5 rounded-full border border-ink-2" aria-hidden />
-              Halka: son 1 saat · boyut = büyüklük
+              {t.quake.ring}
             </li>
           </ul>
 
-          <ol className="divide-y divide-line border-t border-line" aria-label="En son depremler">
+          <ol className="divide-y divide-line border-t border-line" aria-label={t.quake.latest}>
             {data.quakes.slice(0, 5).map((q) => (
               <li
                 key={q.id}
