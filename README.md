@@ -36,15 +36,15 @@ halka açık API'lere doğrudan bağlanıyor.
 - Build output directory: `out`
 - Ortam değişkenleri: `NODE_VERSION=22` (`.node-version` da okunur), isteğe bağlı `NEXT_PUBLIC_REPO_URL`
 - `NEXT_PUBLIC_BASE_PATH` **tanımlama** (kök dizinden yayınlanır).
-- Özel alan adı: Pages projesi → Custom domains → Set up a domain. Alan adı Cloudflare DNS'teyse
-  CNAME otomatik eklenir; değilse alt alan adı için `CNAME  <alt-alan>  <proje>.pages.dev` kaydı gerekir.
-  Kök alan adı (apex) için alan adının DNS'i Cloudflare'e taşınmalıdır (nameserver değişikliği).
+- Özel alan adı (alan adı aynı Cloudflare hesabında): Pages projesi → Custom domains → Set up a domain →
+  `pulse.beraekimci.com.tr`. Cloudflare DNS'e `CNAME pulse → <proje>.pages.dev` (proxied) kaydını kendisi ekler;
+  elle eklemek için DNS → Records bölümünden aynı kaydı girin. SSL otomatik gelir, durum birkaç dakikada "Active" olur.
 
 **GitHub Pages (ikincil)** · `.github/workflows/pages.yml`:
 
 1. Repo → Settings → Pages → Source: **GitHub Actions**.
 2. `main`'e push veya Actions → "GitHub Pages" → Run workflow.
-3. Adres: `https://<kullanıcı>.github.io/live-pulse-dashboard/`. Özel alan adı kullanılacaksa Settings → Pages →
+3. Adres: `https://<kullanıcı>.github.io/live-pulse-dashboard/`. Özel alan adı kullanılacaksa (Cloudflare yerine) Settings → Pages →
    Custom domain'i girin ve repo variable `PAGES_BASE_PATH` değerini `/` yapın.
 
 ## Mimari

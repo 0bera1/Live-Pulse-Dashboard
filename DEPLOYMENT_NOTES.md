@@ -7,6 +7,7 @@ Live Pulse Dashboard'u yayına alırken ve yayından sonra ele alınacak konular
 ## 0. Yayın
 
 Statik export; adımlar için README'deki "Yayınlama (sunucusuz)" bölümüne bakın (Cloudflare Pages birincil, GitHub Pages ikincil).
+Hedef adres: `https://pulse.beraekimci.com.tr`.
 
 ## 1. Deploy öncesi yapılacaklar
 
