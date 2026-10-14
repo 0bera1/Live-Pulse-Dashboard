@@ -1,4 +1,4 @@
-/** Envelope every /api/live-pulse/* route returns on success. */
+/** Envelope `loadSource` resolves with on success. */
 export interface PulsePayload<T> {
   data: T;
   /** Epoch ms when the upstream API was last successfully reached. */

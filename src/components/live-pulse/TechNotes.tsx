@@ -1,6 +1,6 @@
 import { ArrowUpRight } from "lucide-react";
 
-const REPO_URL = process.env.NEXT_PUBLIC_REPO_URL ?? "https://github.com/";
+const REPO_URL = process.env.NEXT_PUBLIC_REPO_URL ?? "https://github.com/0bera1/live-pulse-dashboard";
 
 const STACK = [
   { k: "Framework", v: "Next.js App Router · TypeScript" },
@@ -20,9 +20,8 @@ export function TechNotes() {
           Bu proje nasıl çalışıyor?
         </h2>
         <p className="mt-3 text-sm leading-relaxed text-ink-2">
-          Sahte backend yok. Tarayıcı yalnızca kendi API route&apos;larımızla konuşuyor. Sunucu her kaynağı kendi hız
-          limitine uygun aralıklarla çekip önbelleğe alıyor, böylece ziyaretçi sayısı ne olursa olsun dış servislere
-          giden istek sayısı sabit kalıyor.
+          Sahte backend ve sunucu yok. Sayfa tamamen statik; tarayıcı halka açık API&apos;lere doğrudan bağlanıyor ve
+          her kaynağı kendi hız limitine uygun aralıklarla yeniliyor.
         </p>
         <a
           href={REPO_URL}

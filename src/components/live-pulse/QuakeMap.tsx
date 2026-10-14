@@ -8,7 +8,7 @@ import { RelativeTime } from "./RelativeTime";
 
 const WIDTH = 800;
 const HEIGHT = 390;
-const GEO_URL = "/geo/countries-110m.json";
+const GEO_URL = `${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/geo/countries-110m.json`;
 const RECENT_MS = 60 * 60 * 1000;
 
 export const QUAKE_TIERS = [

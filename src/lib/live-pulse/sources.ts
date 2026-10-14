@@ -1,4 +1,3 @@
-import "server-only";
 import { cached, fetchJson } from "./cache";
 import type {
   CityWeather,
@@ -7,9 +6,11 @@ import type {
   GithubData,
   GithubEvent,
   GithubEventKind,
+  PulsePayload,
   QuakeData,
+  SourceId,
   WeatherData,
-} from "../types";
+} from "./types";
 
 // ── Earthquakes · USGS ─────────────────────────────────────────
 interface UsgsFeed {
@@ -238,13 +239,8 @@ const KIND: Record<string, GithubEventKind> = {
 };
 
 export async function loadGithub(): Promise<GithubData> {
-  const token = process.env.GITHUB_TOKEN; // optional, raises the 60 req/h limit
-  const raw = await fetchJson<GhEvent[]>("https://api.github.com/events?per_page=60", {
-    headers: {
-      Accept: "application/vnd.github+json",
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
-    },
-  });
+  // Unauthenticated, called from the visitor's browser: 60 req/h per IP.
+  const raw = await fetchJson<GhEvent[]>("https://api.github.com/events?per_page=60");
 
   const events: GithubEvent[] = raw
     .filter((e) => !e.actor.login.endsWith("[bot]"))
@@ -262,4 +258,19 @@ export async function loadGithub(): Promise<GithubData> {
     .sort((a, b) => b.createdAt - a.createdAt);
 
   return { events };
+}
+
+// ── Registry · what usePolling calls ───────────────────────────
+// `ttl` is how long a snapshot is reused before the upstream API is hit again.
+const SOURCES = {
+  crypto: { ttl: 4, load: loadCrypto },
+  earthquakes: { ttl: 60, load: loadEarthquakes },
+  fx: { ttl: 1800, load: loadFx },
+  github: { ttl: 90, load: loadGithub },
+  weather: { ttl: 300, load: loadWeather },
+} satisfies Record<SourceId, { ttl: number; load: () => Promise<unknown> }>;
+
+export function loadSource<T>(source: SourceId): Promise<PulsePayload<T>> {
+  const { ttl, load } = SOURCES[source];
+  return cached(source, ttl * 1000, load as () => Promise<T>);
 }

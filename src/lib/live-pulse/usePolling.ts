@@ -1,16 +1,17 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { loadSource } from "./sources";
 import { recordPoll, reportSource, type SourceStatus } from "./status-store";
-import type { PulsePayload, SourceId } from "./types";
+import type { SourceId } from "./types";
 
 export interface PollingState<T> {
   /** Last known good data; kept even when a later poll fails. */
   data: T | null;
-  /** Epoch ms when the server last reached the upstream API. */
+  /** Epoch ms when we last reached the upstream API. */
   fetchedAt: number | null;
   loading: boolean;
-  /** True when the latest poll failed or the server served a stale copy. */
+  /** True when the latest poll failed or a stale copy was served. */
   degraded: boolean;
 }
 
@@ -24,7 +25,7 @@ export interface Change {
 export type Describe<T> = (next: T, prev: T | null) => Change;
 
 /**
- * Polls `/api/live-pulse/{source}` every `intervalMs`.
+ * Polls the public API behind `source` (straight from the browser) every `intervalMs`.
  *
  * - Pauses while the tab is hidden and refreshes immediately when it returns.
  * - Never overlaps requests; aborts the in-flight one on unmount.
@@ -80,17 +81,13 @@ export function usePolling<T>(
       let change: Change;
 
       try {
-        const res = await fetch(`/api/live-pulse/${source}`, {
-          signal: controller.signal,
-          cache: "no-store",
-        });
-        code = res.status;
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        const body = (await res.json()) as PulsePayload<T>;
+        const body = await loadSource<T>(source);
+        if (controller.signal.aborted) return;
+        code = 200;
         const prev = latest.current;
         const isNew = body.fetchedAt !== prev.fetchedAt;
 
-        // On a server-cache hit, describe the snapshot against itself so the
+        // On a cache hit, describe the snapshot against itself so the
         // log still reports current values ("yeni deprem yok · 36 izleniyor").
         change = describeRef.current(body.data, isNew ? prev.data : body.data);
         if (body.stale) change = { message: `kaynak yanıt vermiyor · son bilinen veri korunuyor` };

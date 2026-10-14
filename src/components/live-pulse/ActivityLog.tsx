@@ -36,7 +36,7 @@ export function ActivityLog() {
           <span className="size-1.5 rounded-full bg-up pulse-dot" aria-hidden />
           Canlı sistem günlüğü
         </h2>
-        <span className="hidden font-mono text-[11px] text-muted sm:inline">tarayıcı → /api/live-pulse/* → halka açık API</span>
+        <span className="hidden font-mono text-[11px] text-muted sm:inline">tarayıcı → halka açık API</span>
       </header>
 
       <ol

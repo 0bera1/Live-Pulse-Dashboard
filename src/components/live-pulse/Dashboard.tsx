@@ -9,7 +9,7 @@ import { WeatherCard } from "./WeatherCard";
 
 /**
  * Self-contained Live Pulse page body. To embed in another Next.js site, copy
- * `components/live-pulse`, `lib/live-pulse`, `app/api/live-pulse`,
+ * `components/live-pulse`, `lib/live-pulse`,
  * `public/geo` and the theme tokens in globals.css.
  */
 export function Dashboard() {
