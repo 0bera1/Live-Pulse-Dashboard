@@ -5,7 +5,7 @@ const REPO_URL = process.env.NEXT_PUBLIC_REPO_URL ?? "https://github.com/0bera1/
 const STACK = [
   { k: "Framework", v: "Next.js App Router · TypeScript" },
   { k: "Veri", v: "5 halka açık API, anahtar gerektirmez" },
-  { k: "Proxy", v: "Route Handler + paylaşımlı TTL önbellek" },
+  { k: "Yayın", v: "Statik export · tarayıcıdan doğrudan API + sekme içi TTL önbellek" },
   { k: "Güncelleme", v: "Interval tabanlı polling, sekme gizliyken durur" },
   { k: "Dayanıklılık", v: "Kaynak düşerse son bilinen veri gösterilir" },
   { k: "Arayüz", v: "Tailwind CSS · Framer Motion · react-simple-maps" },

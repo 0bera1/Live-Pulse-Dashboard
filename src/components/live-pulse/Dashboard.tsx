@@ -1,6 +1,7 @@
 import { ActivityLog } from "./ActivityLog";
 import { CryptoCard } from "./CryptoCard";
 import { EarthquakeCard } from "./EarthquakeCard";
+import { Footer } from "./Footer";
 import { FxCard } from "./FxCard";
 import { GithubCard } from "./GithubCard";
 import { StatusHeader } from "./StatusHeader";
@@ -29,6 +30,7 @@ export function Dashboard() {
       </main>
 
       <TechNotes />
+      <Footer />
     </div>
   );
 }
