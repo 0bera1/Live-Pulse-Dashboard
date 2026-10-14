@@ -11,6 +11,12 @@ tüm veriler ücretsiz, anahtar gerektirmeyen halka açık API'lerden geliyor.
 | Hava durumu | Open-Meteo | 5 dk | 30 sn |
 | GitHub akışı | GitHub REST `/events` | 90 sn | 90 sn |
 
+## Diller
+
+Arayüz Türkçe, İngilizce, İspanyolca ve Çince destekler (sayfanın sağ üstündeki seçici). Seçim tarayıcıda
+saklanır; ilk açılışta tarayıcı dili kullanılır. Metinler `src/lib/live-pulse/i18n.ts` içinde; yeni dil için
+o dosyaya bir sözlük ve `LOCALES` listesine bir giriş eklemek yeterli.
+
 ## Çalıştırma
 
 ```bash

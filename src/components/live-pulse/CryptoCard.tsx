@@ -1,6 +1,7 @@
 "use client";
 
 import { Coins } from "lucide-react";
+import { useT } from "@/lib/live-pulse/i18n";
 import { describeCrypto } from "@/lib/live-pulse/describe";
 import { fmtUsd } from "@/lib/live-pulse/format";
 import type { CryptoData } from "@/lib/live-pulse/types";
@@ -12,14 +13,15 @@ import { SkeletonRows } from "./Skeleton";
 import { Sparkline } from "./Sparkline";
 
 export function CryptoCard({ className }: { className?: string }) {
+  const t = useT();
   const { data, fetchedAt, loading, degraded } = usePolling<CryptoData>("crypto", 5_000, describeCrypto);
   const hasHistory = data?.coins.some((c) => c.history.length > 1);
 
   return (
     <ModuleCard
       sourceId="crypto"
-      title="Kripto Piyasası"
-      subtitle="USD · anlık fiyat · 5 sn"
+      title={t.crypto.title}
+      subtitle={t.crypto.subtitle}
       icon={Coins}
       source={hasHistory ? "Binance market data" : "CoinGecko"}
       sourceHref={hasHistory ? "https://data-api.binance.vision" : "https://www.coingecko.com/"}
@@ -37,7 +39,7 @@ export function CryptoCard({ className }: { className?: string }) {
               {c.symbol}
             </span>
             <span className="min-w-0 flex-1 truncate text-sm text-ink-2">{c.name}</span>
-            <Sparkline values={c.history} width={72} color="var(--accent)" label={`${c.name} son 1 saat`} />
+            <Sparkline values={c.history} width={72} color="var(--accent)" label={t.crypto.spark(c.name)} />
             <div className="flex w-[6.5rem] flex-col items-end gap-0.5">
               <AnimatedNumber value={c.priceUsd} format={fmtUsd} duration={0.6} className="font-mono text-base font-semibold text-ink" />
               <Delta value={c.change24h} />
@@ -46,7 +48,7 @@ export function CryptoCard({ className }: { className?: string }) {
         ))}
       </ul>
       {hasHistory && (
-        <p className="mt-auto pt-4 font-mono text-[11px] text-muted">Grafik: son 60 dakika · değişim: 24 saat</p>
+        <p className="mt-auto pt-4 font-mono text-[11px] text-muted">{t.crypto.note}</p>
       )}
     </ModuleCard>
   );

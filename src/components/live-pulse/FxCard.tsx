@@ -1,6 +1,7 @@
 "use client";
 
 import { Landmark } from "lucide-react";
+import { useT } from "@/lib/live-pulse/i18n";
 import { describeFx } from "@/lib/live-pulse/describe";
 import { fmtFixed } from "@/lib/live-pulse/format";
 import type { FxData } from "@/lib/live-pulse/types";
@@ -14,13 +15,14 @@ import { Sparkline } from "./Sparkline";
 const fmtRate = (n: number) => fmtFixed(n, 4);
 
 export function FxCard({ className }: { className?: string }) {
+  const t = useT();
   const { data, fetchedAt, loading, degraded } = usePolling<FxData>("fx", 60_000, describeFx);
 
   return (
     <ModuleCard
       sourceId="fx"
-      title="Döviz Kurları"
-      subtitle={data ? `ECB referans · ${data.date}` : "ECB referans kurları"}
+      title={t.fx.title}
+      subtitle={t.fx.subtitle(data?.date ?? null)}
       icon={Landmark}
       source="Frankfurter / ECB"
       sourceHref="https://frankfurter.dev/"
@@ -36,12 +38,12 @@ export function FxCard({ className }: { className?: string }) {
           <li key={p.pair} className="flex items-center gap-3 py-3 first:pt-0 last:pb-0">
             <div className="min-w-0 flex-1">
               <p className="font-mono text-sm font-semibold text-ink">{p.pair}</p>
-              <p className="truncate text-xs text-muted">{p.label}</p>
+              <p className="truncate text-xs text-muted">{t.fx.labels[p.pair] ?? p.label}</p>
             </div>
             <Sparkline
               values={p.history}
               color="var(--accent)"
-              label={`${p.pair} son ${p.history.length} iş günü trendi`}
+              label={t.fx.spark(p.pair, p.history.length)}
             />
             <div className="flex w-24 flex-col items-end gap-0.5">
               <AnimatedNumber value={p.rate} format={fmtRate} className="font-mono text-base font-semibold text-ink" />
@@ -50,7 +52,7 @@ export function FxCard({ className }: { className?: string }) {
           </li>
         ))}
       </ul>
-      <p className="mt-auto pt-4 font-mono text-[11px] text-muted">Değişim: önceki iş gününe göre · grafik: son 3 hafta</p>
+      <p className="mt-auto pt-4 font-mono text-[11px] text-muted">{t.fx.note}</p>
     </ModuleCard>
   );
 }

@@ -1,6 +1,7 @@
 "use client";
 
 import { CloudSun, Wind } from "lucide-react";
+import { useT } from "@/lib/live-pulse/i18n";
 import { cityTime, fmtFixed } from "@/lib/live-pulse/format";
 import type { WeatherData } from "@/lib/live-pulse/types";
 import { useNow } from "@/lib/live-pulse/useNow";
@@ -14,14 +15,15 @@ import { Skeleton } from "./Skeleton";
 const fmtTemp = (n: number) => `${fmtFixed(n, 0)}°`;
 
 export function WeatherCard({ className }: { className?: string }) {
+  const t = useT();
   const { data, fetchedAt, loading, degraded } = usePolling<WeatherData>("weather", 30_000, describeWeather);
   const now = useNow(15_000);
 
   return (
     <ModuleCard
       sourceId="weather"
-      title="Dünya Hava Durumu"
-      subtitle="Anlık · 6 şehir"
+      title={t.weather.title}
+      subtitle={t.weather.subtitle}
       icon={CloudSun}
       source="Open-Meteo"
       sourceHref="https://open-meteo.com/"
@@ -46,7 +48,7 @@ export function WeatherCard({ className }: { className?: string }) {
             <li key={c.city} className="rounded-lg border border-line bg-surface-2/50 p-3.5">
               <div className="flex items-start justify-between gap-2">
                 <div className="min-w-0">
-                  <p className="truncate text-sm font-medium text-ink">{c.city}</p>
+                  <p className="truncate text-sm font-medium text-ink">{t.weather.cities[c.city] ?? c.city}</p>
                   <p className="font-mono text-[11px] text-muted" suppressHydrationWarning>
                     {c.country} · {now ? cityTime(c.utcOffsetSec, now) : "--:--"}
                   </p>
@@ -56,7 +58,7 @@ export function WeatherCard({ className }: { className?: string }) {
               <AnimatedNumber value={c.tempC} format={fmtTemp} className="mt-2 block text-3xl font-semibold text-ink" />
               <p className="mt-1 truncate text-xs text-ink-2">{w.label}</p>
               <p className="mt-0.5 flex items-center gap-1 font-mono text-[11px] text-muted">
-                <Wind size={11} aria-hidden /> {fmtFixed(c.windKmh, 0)} km/s
+                <Wind size={11} aria-hidden /> {fmtFixed(c.windKmh, 0)} {t.weather.windUnit}
               </p>
             </li>
           );

@@ -1,11 +1,12 @@
-const LOCALE = "tr-TR";
+import { getDict } from "./i18n";
 
 const cache = new Map<string, Intl.NumberFormat>();
 function nf(min: number, max: number, style?: "currency") {
-  const key = `${min}-${max}-${style ?? ""}`;
+  const locale = getDict().intl;
+  const key = `${locale}-${min}-${max}-${style ?? ""}`;
   let f = cache.get(key);
   if (!f) {
-    f = new Intl.NumberFormat(LOCALE, {
+    f = new Intl.NumberFormat(locale, {
       minimumFractionDigits: min,
       maximumFractionDigits: max,
       ...(style ? { style, currency: "USD", currencyDisplay: "narrowSymbol" } : {}),
@@ -30,17 +31,18 @@ export function fmtPct(n: number, digits = 2) {
 
 export function relativeTime(ms: number, now = Date.now()) {
   const s = Math.max(0, Math.round((now - ms) / 1000));
-  if (s < 5) return "şimdi";
-  if (s < 60) return `${s} sn önce`;
+  const t = getDict().time;
+  if (s < 5) return t.now;
+  if (s < 60) return t.seconds(s);
   const m = Math.floor(s / 60);
-  if (m < 60) return `${m} dk önce`;
+  if (m < 60) return t.minutes(m);
   const h = Math.floor(m / 60);
-  if (h < 24) return `${h} sa önce`;
-  return `${Math.floor(h / 24)} gün önce`;
+  if (h < 24) return t.hours(h);
+  return t.days(Math.floor(h / 24));
 }
 
 export function clockTime(ms: number) {
-  return new Date(ms).toLocaleTimeString(LOCALE, {
+  return new Date(ms).toLocaleTimeString(getDict().intl, {
     hour: "2-digit",
     minute: "2-digit",
     second: "2-digit",

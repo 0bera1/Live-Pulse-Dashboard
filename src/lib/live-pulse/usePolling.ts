@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { getDict } from "./i18n";
 import { loadSource } from "./sources";
 import { recordPoll, reportSource, type SourceStatus } from "./status-store";
 import type { SourceId } from "./types";
@@ -90,7 +91,7 @@ export function usePolling<T>(
         // On a cache hit, describe the snapshot against itself so the
         // log still reports current values ("yeni deprem yok · 36 izleniyor").
         change = describeRef.current(body.data, isNew ? prev.data : body.data);
-        if (body.stale) change = { message: `kaynak yanıt vermiyor · son bilinen veri korunuyor` };
+        if (body.stale) change = { message: getDict().msg.stale };
 
         commit({
           data: isNew ? body.data : prev.data,
@@ -101,7 +102,7 @@ export function usePolling<T>(
       } catch (err) {
         if ((err as Error).name === "AbortError") return;
         change = {
-          message: latest.current.data ? "istek başarısız · son bilinen veri korunuyor" : "istek başarısız · yeniden denenecek",
+          message: latest.current.data ? getDict().msg.failedKeep : getDict().msg.failedRetry,
         };
         commit({ ...latest.current, loading: false, degraded: true });
       }

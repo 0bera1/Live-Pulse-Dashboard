@@ -1,5 +1,6 @@
 "use client";
 
+import { useT } from "@/lib/live-pulse/i18n";
 import { useSourceState } from "@/lib/live-pulse/status-store";
 import type { SourceId } from "@/lib/live-pulse/types";
 import { useNow } from "@/lib/live-pulse/useNow";
@@ -22,8 +23,9 @@ export function RefreshBar({ source }: { source: SourceId }) {
   );
 }
 
-/** "142 ms · 4 sn sonra" — the measured round-trip and a countdown to the next poll. */
+/** "142 ms · in 4 s" — the measured round-trip and a countdown to the next poll. */
 export function PollCountdown({ source }: { source: SourceId }) {
+  const t = useT();
   const { nextAt, latencyMs } = useSourceState(source);
   const now = useNow(1000);
   if (latencyMs == null) return null;
@@ -33,7 +35,7 @@ export function PollCountdown({ source }: { source: SourceId }) {
     <span className="tabular-nums">
       {latencyMs} ms
       <span className="text-muted/60"> · </span>
-      {left == null ? "duraklatıldı" : left === 0 ? "yenileniyor…" : `${left} sn sonra yenilenir`}
+      {left == null ? t.card.paused : left === 0 ? t.card.refreshing : t.card.refreshIn(left)}
     </span>
   );
 }

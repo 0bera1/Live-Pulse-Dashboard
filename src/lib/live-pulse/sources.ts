@@ -47,7 +47,7 @@ export async function loadEarthquakes(): Promise<QuakeData> {
     }))
     .sort((a, b) => b.time - a.time);
 
-  return { windowLabel: "Son 24 saat · M2.5+", count: quakes.length, quakes };
+  return { count: quakes.length, quakes };
 }
 
 // ── FX · Frankfurter (ECB reference rates) ─────────────────────
@@ -177,12 +177,12 @@ export async function loadCrypto(): Promise<CryptoData> {
 
 // ── Weather · Open-Meteo ───────────────────────────────────────
 const CITIES = [
-  { city: "İstanbul", country: "TR", lat: 41.01, lon: 28.97 },
-  { city: "Ankara", country: "TR", lat: 39.93, lon: 32.86 },
-  { city: "Londra", country: "GB", lat: 51.51, lon: -0.13 },
-  { city: "New York", country: "US", lat: 40.71, lon: -74.01 },
-  { city: "Tokyo", country: "JP", lat: 35.68, lon: 139.69 },
-  { city: "Sidney", country: "AU", lat: -33.87, lon: 151.21 },
+  { city: "istanbul", country: "TR", lat: 41.01, lon: 28.97 },
+  { city: "ankara", country: "TR", lat: 39.93, lon: 32.86 },
+  { city: "london", country: "GB", lat: 51.51, lon: -0.13 },
+  { city: "newyork", country: "US", lat: 40.71, lon: -74.01 },
+  { city: "tokyo", country: "JP", lat: 35.68, lon: 139.69 },
+  { city: "sydney", country: "AU", lat: -33.87, lon: 151.21 },
 ];
 
 interface MeteoPoint {
