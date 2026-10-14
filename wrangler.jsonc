@@ -1,0 +1,10 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "live-pulse-dashboard",
+  "compatibility_date": "2026-10-12",
+  // Static export: `npm run build` writes ./out, Workers serves it as static assets.
+  "assets": {
+    "directory": "./out",
+    "not_found_handling": "404-page"
+  }
+}

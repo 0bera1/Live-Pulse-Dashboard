@@ -29,15 +29,16 @@ npm run build   # statik çıktı: ./out
 Proje tamamen statik (`output: "export"`); çalışma anında sunucu yok. Tarayıcı, CORS'a izin veren
 halka açık API'lere doğrudan bağlanıyor.
 
-**Cloudflare Pages (birincil)** · Dashboard → Workers & Pages → Create → Pages → Connect to Git:
+**Cloudflare (birincil)** · Dashboard → Workers & Pages → Create → Connect to Git. Yeni arayüz projeyi
+Worker olarak kurar; `wrangler.jsonc` `./out` klasörünü statik varlık olarak yayınlar, ayarlar:
 
-- Framework preset: `Next.js (Static HTML Export)` (ya da None)
 - Build command: `npm run build`
-- Build output directory: `out`
+- Deploy command: `npx wrangler deploy` (varsayılan)
 - Ortam değişkenleri: `NODE_VERSION=22` (`.node-version` da okunur), isteğe bağlı `NEXT_PUBLIC_REPO_URL`
 - `NEXT_PUBLIC_BASE_PATH` **tanımlama** (kök dizinden yayınlanır).
-- Özel alan adı (alan adı aynı Cloudflare hesabında): Pages projesi → Custom domains → Set up a domain →
-  `pulse.beraekimci.com.tr`. Cloudflare DNS'e `CNAME pulse → <proje>.pages.dev` (proxied) kaydını kendisi ekler;
+- Klasik Pages projesi kullanırsanız: build output directory `out`, deploy komutu yok.
+- Özel alan adı (alan adı aynı Cloudflare hesabında): proje → Settings → Domains & Routes → Add → Custom domain →
+  `pulse.beraekimci.com.tr` (Pages projesinde: Custom domains). Cloudflare DNS'e gerekli kaydı (proxied) kaydını kendisi ekler;
   elle eklemek için DNS → Records bölümünden aynı kaydı girin. SSL otomatik gelir, durum birkaç dakikada "Active" olur.
 
 **GitHub Pages (ikincil)** · `.github/workflows/pages.yml`:
