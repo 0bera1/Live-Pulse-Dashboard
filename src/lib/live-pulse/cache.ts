@@ -1,5 +1,4 @@
-import "server-only";
-import type { PulsePayload } from "../types";
+import type { PulsePayload } from "./types";
 
 interface Entry<T> {
   data: T;
@@ -10,7 +9,7 @@ const store = new Map<string, Entry<unknown>>();
 const inflight = new Map<string, Promise<Entry<unknown>>>();
 
 /**
- * Process-wide TTL cache in front of an upstream API.
+ * Per-tab TTL cache in front of an upstream API.
  *
  * - Every visitor shares one upstream call per `ttlMs`, which keeps us far
  *   below the free-tier rate limits no matter how many tabs are polling.
@@ -48,7 +47,7 @@ export async function cached<T>(
   }
 }
 
-/** fetch() with a hard timeout and a JSON body, bypassing Next's data cache. */
+/** fetch() with a hard timeout and a JSON body. */
 export async function fetchJson<T>(
   url: string,
   init: RequestInit = {},
@@ -58,7 +57,6 @@ export async function fetchJson<T>(
     ...init,
     cache: "no-store",
     signal: AbortSignal.timeout(timeoutMs),
-    headers: { "User-Agent": "live-pulse-dashboard", ...init.headers },
   });
   if (!res.ok) throw new Error(`${url} → HTTP ${res.status}`);
   return (await res.json()) as T;

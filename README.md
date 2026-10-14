@@ -1,41 +1,62 @@
 # Live Pulse · Canlı Nabız Paneli
 
-Dünyanın nabzını gerçek zamanlı izleyen operasyon merkezi tarzı dashboard. Sahte backend yok;
+Dünyanın nabzını gerçek zamanlı izleyen operasyon merkezi tarzı dashboard. Sahte backend ve sunucu yok;
 tüm veriler ücretsiz, anahtar gerektirmeyen halka açık API'lerden geliyor.
 
-| Modül | Kaynak | Sunucu önbelleği | Tarayıcı polling |
+| Modül | Kaynak | Önbellek (sekme) | Tarayıcı polling |
 |---|---|---|---|
-| Deprem haritası | USGS Earthquake API | 60 sn | 30 sn |
-| Kripto | CoinGecko | 30 sn | 30 sn |
+| Deprem haritası | USGS Earthquake API | 60 sn | 20 sn |
+| Kripto | Binance (yedek: CoinGecko) | 4 sn | 5 sn |
 | Döviz | Frankfurter (ECB) | 30 dk | 60 sn |
-| Hava durumu | Open-Meteo | 5 dk | 60 sn |
-| GitHub akışı | GitHub REST `/events` | 90 sn | 30 sn |
+| Hava durumu | Open-Meteo | 5 dk | 30 sn |
+| GitHub akışı | GitHub REST `/events` | 90 sn | 90 sn |
 
 ## Çalıştırma
 
 ```bash
 npm install
 npm run dev     # http://localhost:3000
-npm run build && npm start
+npm run build   # statik çıktı: ./out
 ```
 
-İsteğe bağlı ortam değişkenleri:
+İsteğe bağlı ortam değişkenleri (build sırasında okunur):
 
-- `GITHUB_TOKEN`: GitHub hız limitini 60'tan 5000 istek/saate çıkarır (ücretsiz kişisel token).
 - `NEXT_PUBLIC_REPO_URL`: alt kısımdaki "Kaynak kodu" bağlantısı.
+- `NEXT_PUBLIC_BASE_PATH`: site bir alt yoldan yayınlanacaksa (GitHub Pages proje sitesi: `/live-pulse-dashboard`).
+
+## Yayınlama (sunucusuz)
+
+Proje tamamen statik (`output: "export"`); çalışma anında sunucu yok. Tarayıcı, CORS'a izin veren
+halka açık API'lere doğrudan bağlanıyor.
+
+**Cloudflare Pages (birincil)** · Dashboard → Workers & Pages → Create → Pages → Connect to Git:
+
+- Framework preset: `Next.js (Static HTML Export)` (ya da None)
+- Build command: `npm run build`
+- Build output directory: `out`
+- Ortam değişkenleri: `NODE_VERSION=22` (`.node-version` da okunur), isteğe bağlı `NEXT_PUBLIC_REPO_URL`
+- `NEXT_PUBLIC_BASE_PATH` **tanımlama** (kök dizinden yayınlanır).
+- Özel alan adı: Pages projesi → Custom domains → Set up a domain. Alan adı Cloudflare DNS'teyse
+  CNAME otomatik eklenir; değilse alt alan adı için `CNAME  <alt-alan>  <proje>.pages.dev` kaydı gerekir.
+  Kök alan adı (apex) için alan adının DNS'i Cloudflare'e taşınmalıdır (nameserver değişikliği).
+
+**GitHub Pages (ikincil)** · `.github/workflows/pages.yml`:
+
+1. Repo → Settings → Pages → Source: **GitHub Actions**.
+2. `main`'e push veya Actions → "GitHub Pages" → Run workflow.
+3. Adres: `https://<kullanıcı>.github.io/live-pulse-dashboard/`. Özel alan adı kullanılacaksa Settings → Pages →
+   Custom domain'i girin ve repo variable `PAGES_BASE_PATH` değerini `/` yapın.
 
 ## Mimari
 
-- `src/app/api/live-pulse/*/route.ts`: her kaynak için sunucu tarafı proxy (CORS ve hız limiti koruması).
-- `src/lib/live-pulse/server/cache.ts`: paylaşımlı TTL önbellek. Eşzamanlı istekleri birleştirir;
+- `src/lib/live-pulse/sources.ts`: her kaynak için tarayıcıdan çağrılan yükleyici ve kaynak tablosu (`loadSource`).
+- `src/lib/live-pulse/cache.ts`: sekme içi TTL önbellek. Eşzamanlı istekleri birleştirir;
   dış API düşerse son bilinen veriyi `stale: true` ile döner.
 - `src/lib/live-pulse/usePolling.ts`: interval tabanlı fetch. Sekme gizliyken durur, aynı veri gelirse
   yeniden render etmez.
 - `src/lib/live-pulse/status-store.ts`: üst başlıktaki SYSTEM STATUS göstergesini besleyen küçük store.
 - `src/components/live-pulse/*`: her veri kartı ayrı bir component.
 
-## Portfolyo sitesine taşıma
-
-`src/components/live-pulse`, `src/lib/live-pulse`, `src/app/api/live-pulse`, `public/geo` klasörlerini ve
-`globals.css` içindeki tema token'larını kopyalayın. Ardından istediğiniz sayfada `<Dashboard />` render edin.
-Bağımlılıklar: `framer-motion`, `react-simple-maps`, `lucide-react`, `server-only`.
+Not: istekler ziyaretçinin tarayıcısından gittiği için hız limitleri ziyaretçi başınadır. GitHub
+(`/events`, anahtarsız) saatte 60 istek verir; bu yüzden 90 sn'de bir sorgulanır (≈40/saat). Token
+kullanılmıyor, çünkü statik sitede gizli tutulamaz.

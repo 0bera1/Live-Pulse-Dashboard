@@ -14,8 +14,7 @@
     "next": "16.4.0",
     "react": "19.3.0",
     "react-dom": "19.3.0",
-    "react-simple-maps": "^5.0.5",
-    "server-only": "^0.0.1"
+    "react-simple-maps": "^5.0.5"
   },
   "devDependencies": {
     "@tailwindcss/turbopack": "^4",

@@ -22,7 +22,7 @@ import { RelativeTime } from "./RelativeTime";
 import { SkeletonRows } from "./Skeleton";
 
 const VISIBLE = 7;
-/** New events are spread over roughly one server refresh window. */
+/** New events are spread over roughly one refresh window. */
 const DRAIN_WINDOW_MS = 80_000;
 const MIN_GAP_MS = 1_500;
 const MAX_GAP_MS = 8_000;
@@ -92,7 +92,7 @@ function useEventStream(data: GithubData | null) {
 }
 
 export function GithubCard({ className }: { className?: string }) {
-  const { data, fetchedAt, loading, degraded } = usePolling<GithubData>("github", 30_000, describeGithub);
+  const { data, fetchedAt, loading, degraded } = usePolling<GithubData>("github", 90_000, describeGithub);
   const { rows, queued } = useEventStream(data);
   const reduceMotion = useReducedMotion();
 
